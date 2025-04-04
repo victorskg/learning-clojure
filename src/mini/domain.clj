@@ -131,4 +131,8 @@
 
 (map #(s/valid? :finance/currency %) (vals currencies))
 
+(->>
+ (vals currencies)
+ (map #(s/valid? :finance/currency %)))
 
+;; -> when the parameter passed is the first one ->> when the parameter passed is the last one

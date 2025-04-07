@@ -79,3 +79,12 @@
   (map inc $)  ;; last position
   (conj $ 10)  ;; first position
   (apply + $)) ;; => 25
+
+(defn hire-3 [employee]
+  (as->
+   employee $
+    (assoc $ :email (str (:first-name employee) "@nubank.com"))
+    (update $ :employment-history conj "Nubank")
+    (assoc $  :hired-at (java.util.Date.)))) ;; thread-first - the first value is put in the first argument of the next function
+
+(hire-3 {:first-name "João"})

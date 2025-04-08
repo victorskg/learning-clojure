@@ -1,7 +1,6 @@
 (ns mini.atom)
 
 ;; Atoms
-
 (def first-atom (atom 0))
 (println (deref first-atom)) ;; should deref the atom to get his value
 (println @first-atom) ;; this is also a deref

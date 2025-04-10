@@ -1,5 +1,8 @@
 (ns mini.playground
-  (:import [java.time LocalDateTime]))
+  (:require
+   [clojure.string :as str])
+  (:import
+   [java.time LocalDateTime]))
 
 ; This project has custom configuration.
 ; See .vscode/settings.json
@@ -133,3 +136,75 @@
   (let [values (remove nil? ["Hello," first-name last-name])]
     (clojure.string/join " " values)))
 (say-my-name-9 {:first-name "Walter" :last-name "White"})
+
+(defn stack-tokens [tokens stack]
+  (if (empty? tokens)
+    (first stack)
+    (let [token (first tokens)
+          rest-tokens (rest tokens)]
+      (if (number? token)
+        (stack-tokens rest-tokens (conj stack token))
+        (let [[x y & rest-stack] (reverse stack)
+              result (token y x)]
+          (stack-tokens rest-tokens (vec (reverse (conj rest-stack result)))))))))
+
+(defn evaluate-rpn
+  "Avalia uma expressão matemática em RPN usando recursão e uma pilha simulada."
+  [tokens]
+  (stack-tokens tokens []))
+
+(evaluate-rpn [3 4 + 2 * 7 /]) ;; 2
+(evaluate-rpn [5 1 2 + 4 * + 3 -]) ;; 14
+
+(defn filter-and-sum [values]
+  (->> values
+       (filter even?)
+       (reduce +)))
+
+(filter-and-sum [1 2 3 4 5 6 7 8 9 10]) ;; 30
+
+(defn word-count [value]
+  (let [str-list (str/split value #"\s+")
+        result-map (atom {})]
+    (doseq [w str-list]
+      (if (contains? @result-map w)
+        (swap! result-map update-in [w] inc)
+        (swap! result-map assoc w 1)))
+    @result-map))
+
+(word-count "hello world Hello")
+(word-count "Clojure is fun and Clojure is powerful")
+
+(defn find-max [values]
+  (if (= (count values) 1)
+    (first values)
+    (let [fval (first values)
+          max-rest (find-max (rest values))]
+      (if (> fval max-rest) fval max-rest))))
+
+(find-max [1 2 3 4 5])
+(find-max [-10 -5 -3 -20])
+
+(defn ^:private alguma-funcao
+  [validations]
+  (->> validations
+       (filter #(contains? #{:ident-create :group-create} (% :type)))
+       (map #(get % :id))
+       set))
+;; Dada uma lista de validacoes, se o :type for :ident-create ou :group-create, pega o ID dessa validacao e transforma em um set para evitar duplicatas
+
+(defn append-lead-by-ident-id [element db])
+(defn append-groups-by-ident-id [element el db])
+(defn ^:private alguma-outra-funcao
+  [base-fields
+   fields
+   idents
+   db]
+  (cond-> idents
+    (or (empty? base-fields) (contains? base-fields :lead))
+    (update :results #(append-lead-by-ident-id % db))
+
+    (or (empty? base-fields) (contains? base-fields :groups))
+    (update :results #(append-groups-by-ident-id % (:groups fields) db))))
+;; A funcao privada tem duas condicoes: se base fields for empy ou contiver a chave :lead, atualisa em idents o campo :results fazendo o apend de lead by ident id
+;; a outra condiçao é: caso seja empty o base fields ou contenha a chave :groups, atualiza em idents o campo :results fazendo o apend de groups-by-ident-id onde groups é retirado de fields
